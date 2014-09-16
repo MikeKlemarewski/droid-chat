@@ -1,28 +1,50 @@
 package com.mikeklem.mikechat;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
+import android.widget.Toast;
 
 
 import com.parse.ParseUser;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
+    public static final String TAG = "MainActivity";
+
+    public static final int TAKE_PHOTO_REQUEST = 0;
+    public static final int TAKE_VIDEO_REQUEST = 1;
+    public static final int CHOOSE_PHOTO_REQUEST = 2;
+    public static final int CHOOSE_VIDEO_REQUEST = 3;
+
+    public static final int MEDIA_TYPE_IMAGE = 1;
+    public static final int MEDIA_TYPE_VIDEO = 2;
+
+    protected Uri mMediaUri;
+
     /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
+     * The PagerAdapter that will provide
      * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
+     * FragmentPagerAdapter derivative, which will keep every
      * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v13.app.FragmentStatePagerAdapter}.
+     * may be best to switch to a FragmentStatePagerAdapter.
      */
     SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -30,6 +52,86 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
+
+    protected DialogInterface.OnClickListener mDialogListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialogInterface, int i) {
+            switch(i) {
+                case TAKE_PHOTO_REQUEST:
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    mMediaUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+
+                    // We failed to create a file
+                    if (mMediaUri == null) {
+                        Log.e(TAG, "Problem accessing storage");
+                        break;
+                    }
+
+                    // Tells the device where to store the result
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
+                    startActivityForResult(intent, TAKE_PHOTO_REQUEST);
+                    break;
+                case TAKE_VIDEO_REQUEST:
+                    break;
+                case CHOOSE_PHOTO_REQUEST:
+                    break;
+                case CHOOSE_VIDEO_REQUEST:
+                    break;
+            }
+        }
+    };
+
+    private Uri getOutputMediaFileUri(int mediaType) {
+        if (! isExternalStorageAvailable()) {
+            return null;
+        }
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), getString(R.string.app_name));
+
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                Log.d(TAG, "Failed to create directory");
+                return null;
+            }
+        }
+
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (mediaType == MEDIA_TYPE_IMAGE){
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "IMG_"+ timeStamp + ".jpg");
+        } else if(mediaType == MEDIA_TYPE_VIDEO) {
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+                    "VID_"+ timeStamp + ".mp4");
+        } else {
+            return null;
+        }
+
+        return Uri.fromFile(mediaFile);
+
+    }
+
+    private boolean isExternalStorageAvailable() {
+        String state = Environment.getExternalStorageState();
+        return state.equals(Environment.MEDIA_MOUNTED);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            // Add to gallery
+            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            mediaScanIntent.setData(mMediaUri);
+            sendBroadcast(mediaScanIntent);
+        }
+        else if (resultCode != RESULT_CANCELED) {
+            Toast.makeText(this, getString(R.string.error), Toast.LENGTH_LONG).show();
+            Log.e(TAG, getString(R.string.error));
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +210,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 Intent intent = new Intent(this, EditFriendsActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.action_camera:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setItems(R.array.camera_choices, mDialogListener)
+                       .create().show();
         }
         return super.onOptionsItemSelected(item);
     }
