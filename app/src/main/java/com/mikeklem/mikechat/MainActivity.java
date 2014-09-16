@@ -58,7 +58,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         public void onClick(DialogInterface dialogInterface, int i) {
             switch(i) {
                 case TAKE_PHOTO_REQUEST:
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    Intent photoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     mMediaUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
 
                     // We failed to create a file
@@ -68,10 +68,23 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     }
 
                     // Tells the device where to store the result
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
-                    startActivityForResult(intent, TAKE_PHOTO_REQUEST);
+                    photoIntent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
+                    startActivityForResult(photoIntent, TAKE_PHOTO_REQUEST);
                     break;
                 case TAKE_VIDEO_REQUEST:
+                    Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                    mMediaUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
+
+                    // We failed to create a file
+                    if (mMediaUri == null) {
+                        Log.e(TAG, "Problem accessing storage");
+                        break;
+                    }
+
+                    videoIntent.putExtra(MediaStore.EXTRA_OUTPUT, mMediaUri);
+                    videoIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 10);
+                    videoIntent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
+                    startActivityForResult(videoIntent, TAKE_VIDEO_REQUEST);
                     break;
                 case CHOOSE_PHOTO_REQUEST:
                     break;
