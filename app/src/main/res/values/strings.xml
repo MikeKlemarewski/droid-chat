@@ -4,6 +4,7 @@
     <string name="action_edit_friends">Edit Friends</string>
     <string name="action_logout">Log Out</string>
     <string name="app_name">Mike Chat</string>
+    <string name="camera_label">Camera</string>
     <string name="email_hint">Email</string>
     <string name="friends_empty">Add Friends to Begin!</string>
     <string name="hello_world">Hello world!</string>
