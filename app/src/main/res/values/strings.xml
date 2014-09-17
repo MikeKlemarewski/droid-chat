@@ -38,5 +38,7 @@
     <string name="error_file_send">There was an error sending the file.</string>
     <string name="message_sent">Message sent!</string>
     <string name="error_message_send">There was an error sending message.</string>
+    <string name="title_activity_view_image">View Image</string>
+    <string name="action_settings">Settings</string>
 
 </resources>
