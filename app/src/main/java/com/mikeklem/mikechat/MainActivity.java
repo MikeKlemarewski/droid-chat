@@ -19,6 +19,7 @@ import android.view.Window;
 import android.widget.Toast;
 
 
+import com.parse.Parse;
 import com.parse.ParseUser;
 
 import java.io.File;
@@ -145,7 +146,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK)
+        if (resultCode == RESULT_OK) {
             if (requestCode == CHOOSE_PHOTO_REQUEST || requestCode == CHOOSE_VIDEO_REQUEST) {
                 if (data == null) {
 
@@ -164,8 +165,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     } catch (IOException e) {
                         e.printStackTrace();
                         return;
-                    }
-                    finally {
+                    } finally {
                         try {
                             stream.close();
                         } catch (IOException e) {
@@ -184,6 +184,19 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                 mediaScanIntent.setData(mMediaUri);
                 sendBroadcast(mediaScanIntent);
             }
+
+            Intent intent = new Intent(MainActivity.this, RecipientsActivity.class);
+            intent.setData(mMediaUri);
+            String fileType;
+            if (requestCode == TAKE_PHOTO_REQUEST || requestCode == CHOOSE_PHOTO_REQUEST) {
+                fileType = ParseConstants.TYPE_IMAGE;
+            }
+            else {
+                fileType = ParseConstants.TYPE_VIDEO;
+            }
+            intent.putExtra(ParseConstants.KEY_FILE_TYPE, fileType);
+            startActivity(intent);
+        }
         else if (resultCode != RESULT_CANCELED) {
             Toast.makeText(this, getString(R.string.error), Toast.LENGTH_LONG).show();
             Log.e(TAG, getString(R.string.error));

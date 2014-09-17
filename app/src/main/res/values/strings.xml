@@ -3,6 +3,7 @@
 
     <string name="action_edit_friends">Edit Friends</string>
     <string name="action_logout">Log Out</string>
+    <string name="action_send">Send</string>
     <string name="app_name">Mike Chat</string>
     <string name="camera_label">Camera</string>
     <string name="email_hint">Email</string>
@@ -22,7 +23,6 @@
     <string name="title_section2">Friends</string>
     <string name="username_hint">Username</string>
     <string name="title_activity_edit_friends">EditFriendsActivity</string>
-    <string name="action_settings">Settings</string>
     <string name="parse_query_error">Query Error</string>
     <string name="error">Error</string>
     <string name="error_file_to_big">The file is too large!</string>
@@ -33,4 +33,10 @@
         <item>Choose Picture</item>
         <item>Choose Video</item>
     </string-array>
+
+    <string name="title_activity_recipients">Choose Recipients</string>
+    <string name="error_file_send">There was an error sending the file.</string>
+    <string name="message_sent">Message sent!</string>
+    <string name="error_message_send">There was an error sending message.</string>
+
 </resources>
